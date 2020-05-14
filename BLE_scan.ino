@@ -2,9 +2,9 @@
 // ----------------------------------------------------------------------------
 // Copyright (C) 2020, Tomasz Kuehn
 //
-// These coded instructions, statements, and computer programs are free 
+// These coded instructions, statements, and computer programs are free
 // for personal use.
-// Based on Neil Kolban example for IDF: 
+// Based on Neil Kolban example for IDF:
 // https://github.com/nkolban/esp32-snippets/blob/master/cpp_utils/tests/BLE%20Tests/SampleScan.cpp
 // Ported to Arduino ESP32 by Evandro Copercini and modified by Tomasz Kuehn
 //
@@ -22,15 +22,17 @@
 #include <BLEAddress.h>
 #include <M5Stack.h>
 
+#include "pixels.h"
+
 int scan_time = 5; //In seconds
 BLEScan* p_BLE_scan;
 
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
-  void onResult(BLEAdvertisedDevice advertisedDevice) {
-    M5.Lcd.setTextSize(1);
-    M5.Lcd.setCursor(20, 0);
-    M5.Lcd.printf("%s", advertisedDevice.toString().c_str());
-  }
+    void onResult(BLEAdvertisedDevice advertisedDevice) {
+      M5.Lcd.setTextSize(1);
+      M5.Lcd.setCursor(20, 0);
+      M5.Lcd.printf("%s", advertisedDevice.toString().c_str());
+    }
 };
 
 void setup() {
@@ -43,11 +45,17 @@ void setup() {
 
   M5.Lcd.setCursor(0, 10);
   M5.Lcd.printf("Start");
-  
-  //Serial.begin(115200);
-  //Serial.println("Scanning...");
+
   M5.Lcd.setCursor(0, 20);
   M5.Lcd.printf("Scanning");
+
+  pixels.begin();
+  for (uint8_t n = 0; n < 10; n++)
+  {
+    pixels.setPixelColor(n, pixels.Color(0, 0, 50));
+  }
+  pixels.show();
+  pixels.show();
 
   BLEDevice::init("");
   p_BLE_scan = BLEDevice::getScan(); //create new scan
@@ -59,7 +67,6 @@ void setup() {
 
 BLEAdvertisedDevice advertised_device;
 int rssi;
-std::string bleid;
 std::string blename;
 std::string bleaddr;
 
@@ -72,12 +79,12 @@ void loop() {
   M5.Lcd.printf("Found: %d", foundDevices.getCount());
 
   M5.Lcd.fillRect(0, 70, 320, 240, TFT_BLACK);
-  for(int i = 0; i < foundDevices.getCount(); i++) {
+  for (int i = 0; i < foundDevices.getCount(); i++) {
     advertised_device = foundDevices.getDevice(i);
     blename = advertised_device.getName();
     rssi = advertised_device.getRSSI();
     bleaddr = advertised_device.getAddress().toString();
-    //bleid = ba.toString();
+ 
     M5.Lcd.setCursor(0, 70 + 40 * i);
     M5.Lcd.printf(">%s", blename.c_str());
     M5.Lcd.setCursor(0, 70 + 40 * i + 19);
