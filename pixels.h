@@ -11,10 +11,27 @@
 
 #pragma once
 
-#include <Adafruit_NeoPixel.h>
+#include <FastLED.h>
+#include <M5Stack.h>
 
-#define M5STACK_FIRE_NEO_NUM_LEDS  10
-#define M5STACK_FIRE_NEO_DATA_PIN  15
+#define M5STACK_FIRE_NUM_LEDS 10
+#define M5STACK_FIRE_NEO_DATA_PIN 15
 
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(M5STACK_FIRE_NEO_NUM_LEDS, M5STACK_FIRE_NEO_DATA_PIN,
-                           NEO_GRB + NEO_KHZ800);
+
+//void pixelsInitialize();
+class FireNeopixels {
+  public:
+    FireNeopixels() {
+      FastLED.addLeds<WS2812B, M5STACK_FIRE_NEO_DATA_PIN, GRB>(leds, M5STACK_FIRE_NUM_LEDS);
+      for(int i = 0; i < M5STACK_FIRE_NUM_LEDS; i++) {
+        leds[i] = 0;
+      }
+    }
+    void update() {
+      FastLED.show();
+    }
+    void off() {
+      FastLED.clear();
+    }
+    CRGB leds[M5STACK_FIRE_NUM_LEDS]; // array of leds
+};
