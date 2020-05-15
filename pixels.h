@@ -31,7 +31,10 @@ class FireNeopixels {
       FastLED.show();
     }
     void off() {
-      FastLED.clear();
+      for(int i = 0; i < M5STACK_FIRE_NUM_LEDS; i++) {   
+        leds[i] = 0;
+      }
+      FastLED.show();
     }
     CRGB leds[M5STACK_FIRE_NUM_LEDS]; // array of leds
 };

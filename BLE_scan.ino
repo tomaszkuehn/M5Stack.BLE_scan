@@ -24,19 +24,25 @@
 
 #include "pixels.h"
 
-int scan_time = 5; //In seconds
+int scan_time = 10; //In seconds
 BLEScan* p_BLE_scan;
 FireNeopixels fnp;
 
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
+      for(int i = 0; i < M5STACK_FIRE_NUM_LEDS; i++) {   
+        fnp.leds[i] = CHSV(60+10*i,255,255);
+      }
       fnp.update();
       M5.Lcd.setTextSize(1);
       M5.Lcd.setCursor(20, 0);
       M5.Lcd.printf("%s", advertisedDevice.toString().c_str());
+      delay(10);
       fnp.off();
     }
 };
+
+MyAdvertisedDeviceCallbacks callback = MyAdvertisedDeviceCallbacks();
 
 void setup() {
   M5.begin();
@@ -55,7 +61,7 @@ void setup() {
 
   BLEDevice::init("");
   p_BLE_scan = BLEDevice::getScan(); //create new scan
-  p_BLE_scan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
+  p_BLE_scan->setAdvertisedDeviceCallbacks(&callback);//new MyAdvertisedDeviceCallbacks());
   p_BLE_scan->setActiveScan(true); //active scan uses more power, but get results faster
   p_BLE_scan->setInterval(100);
   p_BLE_scan->setWindow(99);  // less or equal setInterval value
@@ -71,7 +77,7 @@ void loop() {
   static uint8_t hue;
   hue+=10;
   for(int i = 0; i < M5STACK_FIRE_NUM_LEDS; i++) {   
-    fnp.leds[i] = CHSV(hue+10*i,255,255);
+    //fnp.leds[i] = CHSV(hue+10*i,255,255);
   }
   //fnp.update();
   
@@ -80,7 +86,7 @@ void loop() {
   //fnp.off();
   M5.Lcd.setTextSize(2);
   M5.Lcd.setCursor(0, 50);
-  M5.Lcd.printf("Found: %d", foundDevices.getCount());
+  M5.Lcd.printf("Found: %d ", foundDevices.getCount());
 
   M5.Lcd.fillRect(0, 70, 320, 240, TFT_BLACK);
   for (int i = 0; i < foundDevices.getCount(); i++) {
