@@ -22,11 +22,14 @@
 #include <BLEAddress.h>
 #include <M5Stack.h>
 
+#include "FireBatteryLevel.h"
 #include "pixels.h"
+
 
 int scan_time = 10; //In seconds
 BLEScan* p_BLE_scan;
 FireNeopixels fnp;
+FireBatteryLevel battery1;
 
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
@@ -58,7 +61,8 @@ void setup() {
   M5.Lcd.setCursor(0, 25);
   M5.Lcd.printf("Scanning");
 
-
+  battery1.enableBatteryLevel();
+  
   BLEDevice::init("");
   p_BLE_scan = BLEDevice::getScan(); //create new scan
   p_BLE_scan->setAdvertisedDeviceCallbacks(&callback);//new MyAdvertisedDeviceCallbacks());
@@ -87,7 +91,9 @@ void loop() {
   M5.Lcd.setTextSize(2);
   M5.Lcd.setCursor(0, 50);
   M5.Lcd.printf("Found: %d ", foundDevices.getCount());
-
+  M5.Lcd.setCursor(150, 50);
+  M5.Lcd.printf("BAT: %d ", battery1.getBatteryLevel());
+  
   M5.Lcd.fillRect(0, 70, 320, 240, TFT_BLACK);
   for (int i = 0; i < foundDevices.getCount(); i++) {
     advertised_device = foundDevices.getDevice(i);
